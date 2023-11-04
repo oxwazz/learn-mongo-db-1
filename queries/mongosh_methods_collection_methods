@@ -1,0 +1,122 @@
+// === MONGOSH METHODS > COLLECTION METHODS ===
+// docs: https://www.mongodb.com/docs/manual/reference/method/db.collection.analyzeShardKey/
+
+// Name:                                    Description:
+
+// [x] db.collection.find(query, projection, options)                     -> Performs a query on a collection or a view and returns a cursor object.
+// [ ] db.collection.findAndModify()            -> Atomically modifies and returns a single document.
+// [x] db.collection.findOne(query, projection, options)                  -> Performs a query and returns a single document.
+// [ ] db.collection.findOneAndDelete()         -> Finds a single document and deletes it.
+// [ ] db.collection.findOneAndReplace()        -> Finds a single document and replaces it.
+// [ ] db.collection.findOneAndUpdate()         -> Finds a single document and updates it.
+// [ ] db.collection.deleteOne()                -> Deletes a single document in a collection.
+// [ ] db.collection.deleteMany()               -> Deletes multiple documents in a collection.
+// [ ] db.collection.insertOne()                -> Inserts a new document in a collection.
+// [ ] db.collection.insertMany()               -> Inserts several new document in a collection.
+// [ ] db.collection.updateOne()                -> Modifies a single document in a collection.
+// [ ] db.collection.updateMany()               -> Modifies multiple documents in a collection.
+
+// [ ] db.collection.analyzeShardKey()          -> Calculates metrics for evaluating a shard key.
+// [ ] db.collection.aggregate()                -> Provides access to the aggregation pipeline.
+// [ ] db.collection.bulkWrite()                -> Provides bulk write operation functionality.
+// [ ] db.collection.configureQueryAnalyzer()   -> Configures query sampling for a collection.
+// [x] db.collection.count()                    -> Wraps count to return a count of the number of documents in a collection or a view.
+// [ ] db.collection.countDocuments()           -> Wraps the $group aggregation stage with a $sum expression to return a count of the number of documents in a collection or a view.
+// [ ] db.collection.createIndex()              -> Builds an index on a collection.
+// [ ] db.collection.createIndexes()            -> Builds one or more indexes on a collection.
+// [ ] db.collection.dataSize()                 -> Returns the size of the collection. Wraps the size field in the output of the collStats.
+// [ ] db.collection.distinct()                 -> Returns an array of documents that have distinct values for the specified field.
+// [ ] db.collection.drop()                     -> Removes the specified collection from the database.
+// [ ] db.collection.dropIndex()                -> Removes a specified index on a collection.
+// [ ] db.collection.dropIndexes()              -> Removes all indexes on a collection.
+// [ ] db.collection.ensureIndex()              -> Removed. Use db.collection.createIndex().
+// [ ] db.collection.estimatedDocumentCount()   -> Wraps count to return an approximate count of the documents in a collection or a view.
+// [ ] db.collection.explain()                  -> Returns information on the query execution of various methods.
+// [ ] db.collection.getIndexes()               -> Returns an array of documents that describe the existing indexes on a collection.
+// [ ] db.collection.getShardDistribution()     -> For collections in sharded clusters, db.collection.getShardDistribution() reports data of chunk distribution.
+// [ ] db.collection.getShardVersion()          -> Internal diagnostic method for sharded cluster.
+// [ ] db.collection.hideIndex()                -> Hides an index from the query planner.
+// [ ] db.collection.isCapped()                 -> Reports if a collection is a capped collection.
+// [ ] db.collection.latencyStats()             -> Returns latency statistics for a collection.
+// [ ] db.collection.mapReduce()                -> Performs map-reduce style data aggregation.
+// [ ] db.collection.reIndex()                  -> Rebuilds all existing indexes on a collection.
+// [ ] db.collection.remove()                   -> Deletes documents from a collection.
+// [ ] db.collection.renameCollection()         -> Changes the name of a collection.
+// [ ] db.collection.replaceOne()               -> Replaces a single document in a collection.
+// [ ] db.collection.stats()                    -> Reports on the state of a collection. Provides a wrapper around the collStats.
+// [ ] db.collection.storageSize()              -> Reports the total size used by the collection in bytes. Provides a wrapper around the storageSize field of the collStats output.
+// [ ] db.collection.totalIndexSize()           -> Reports the total size used by the indexes on a collection. Provides a wrapper around the totalIndexSize field of the collStats output.
+// [ ] db.collection.totalSize()                -> Reports the total size of a collection, including the size of all documents and all indexes on a collection.
+// [ ] db.collection.unhideIndex()              -> Unhides an index from the query planner.
+// [ ] db.collection.watch()                    -> Establishes a Change Stream on a collection.
+// [ ] db.collection.validate()                 -> Performs diagnostic operations on a collection.
+
+
+
+// ========================== EXAMPLE ==========================
+
+// > db.collection.find(query, projection, options)
+
+db.accounts.find() // -> ambil semua data
+
+db.accounts.find({
+    limit: {
+        $lt: 10000 // -> ambil semua data yang memiliki limit dibawah 10000
+    }
+})
+
+db.accounts.find({}, {
+    products: 1 // -> hanya me-return products
+})
+
+db.accounts.find({}, {
+    products: 0 // -> me-return semua data kecuali products
+})
+
+db.accounts.find({
+    products: {
+        $eq: "CurrencyService" // -> melakukan filter data products "CurrencyService"
+    }
+}, {
+    'products.$': 1 // hanya me-return data ["CurrencyService"]
+})
+
+db.accounts.find({}, {
+    products: {
+        $elemMatch: {
+            $eq: "InvestmentStock" // hanya me-return data ["InvestmentStock"]
+        }
+    }
+})
+
+db.accounts.find({}, {
+    products: {
+        $slice: 2 // hanya me-return 2 data pertama
+    }
+})
+
+db.customers.createIndex({ name: "text" })
+db.customers.find({
+    $text: {
+        $search: "John Barajas nguyen" // -> mencari data yang memiliki kata "John" / "Barajas" / "nguyen"
+    }
+}, {
+  score: {
+    $meta: "textScore" // -> menampilkan score dari pencarian (semakin tinggi semakin relevan)
+  }
+})
+
+db.customers.find({}, {
+    accounts: 1, // -> hanya me-return data accounts
+    sumAccount: { $sum: "$accounts" }, // -> melakukan sum total value terhadap data accounts
+    totalArray: { $size: "$accounts" } // -> melakukan count total array terhadap data accounts
+})
+
+// > db.collection.findOne(query, projection, options)
+db.customers.findOne() // -> mengambil data pertama
+
+
+// > db.collection.count(query, options)
+db.customers.count() // -> menghitung total data
+
+db.customers.find({},{},{ limit: 2 }).count() // -> menghitung total data dengan limit 2

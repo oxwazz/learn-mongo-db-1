@@ -1,0 +1,44 @@
+# https://www.w3resource.com/mongodb-exercises/mongodb-listingsandreviews-collection-index.php#google_vignette
+# https://shantanoo-desai.github.io/posts/technology/seeding-mongodb-docker-compose/
+
+# docker compose down -v --remove-orphans && docker compose up --build
+# docker compose down -v --remove-orphans && docker compose up --force-recreate
+
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+  mongo:
+    env_file:
+      - .env
+    image: mongo:5.0.22
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - datadb:/data/db
+      - configdb:/data/configdb
+
+  # Initial Seed to QualiExplore Database
+  mongo-seed:
+    env_file:
+      - .env
+    build:
+      context: ./mongo-seed
+      dockerfile: Dockerfile
+      args:
+        - DATABASE_URI=$DATABASE_URI
+        - USERNAME=$MONGO_INITDB_ROOT_USERNAME
+        - PASSWORD=$MONGO_INITDB_ROOT_PASSWORD
+    depends_on:
+      - mongo
+    volumes:
+      - datadb:/data/db
+      - configdb:/data/configdb
+
+volumes:
+  datadb:
+  configdb:
